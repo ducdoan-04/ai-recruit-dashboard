@@ -80,8 +80,8 @@ export const getCandidates = async () => {
 export const postToWebsite = async (data) => {
   try {
     console.log("Posting to Website:", data);
-    console.log("Webhook URL:", n8n.defaults.baseURL + "/webhook-test/jobPostWebsite");
-    const res = await n8n.post("/webhook-test/jobPostWebsite", data);
+    console.log("Webhook URL:", n8n.defaults.baseURL + "/webhook/jobPostWebsite");
+    const res = await n8n.post("/webhook/jobPostWebsite", data);
     console.log("Website post response:", res.data);
     return res.data;
   } catch (err) {
