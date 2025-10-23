@@ -7,6 +7,7 @@ import Sidebar from "./components/Sidebar";
 import AutoPostFacebook from "./pages/AutoPostFacebook";
 import AutoPostLinkedIn from "./pages/AutoPostLinkedIn";
 import AutoPostTwitter from "./pages/AutoPostTwitter";
+import AutoPostWebsite from "./pages/AutoPostWebsite";
 import InterviewSchedule from "./pages/InterviewSchedule";
 import Login from "./pages/Login";
 
@@ -75,6 +76,7 @@ export default function App() {
         {activeView === "auto_fb" && <AutoPostFacebook />}
         {activeView === "auto_linkedin" && <AutoPostLinkedIn />}
         {activeView === "auto_twitter" && <AutoPostTwitter />}
+        {activeView === "auto_website" && <AutoPostWebsite />}
         {activeView === "schedule" && <InterviewSchedule />}
       </main>
 

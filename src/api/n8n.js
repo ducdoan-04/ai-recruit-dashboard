@@ -75,3 +75,20 @@ export const getCandidates = async () => {
     throw err;
   }
 };
+
+// Đăng tin tuyển dụng lên website
+export const postToWebsite = async (data) => {
+  try {
+    console.log("Posting to Website:", data);
+    console.log("Webhook URL:", n8n.defaults.baseURL + "/webhook-test/jobPostWebsite");
+    const res = await n8n.post("/webhook-test/jobPostWebsite", data);
+    console.log("Website post response:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error("Error posting to Website:", err);
+    console.error("Error status:", err.response?.status);
+    console.error("Error data:", err.response?.data);
+    console.error("Error config:", err.config);
+    throw err;
+  }
+};

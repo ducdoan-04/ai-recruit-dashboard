@@ -6,6 +6,7 @@ export default function Sidebar({ active, onChange, onLogout }) {
     { id: "auto_fb", label: "Auto Posting - Facebook" },
     { id: "auto_linkedin", label: "Auto Posting - LinkedIn" },
     { id: "auto_twitter", label: "Auto Posting - Twitter" },
+    { id: "auto_website", label: "Auto Posting - Website" },
     { id: "schedule", label: "Interview Schedule" },
   ];
 
