@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { postToTwitter } from "../api/n8n";
+import { postToTwitter } from "../../api/n8n";
 
 export default function AutoPostTwitter() {
   const [form, setForm] = useState({

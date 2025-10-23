@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getInterviewSchedule } from "../api/n8n";
+import { getInterviewSchedule } from "../../api/n8n";
 
 export default function InterviewSchedule() {
   const [events, setEvents] = useState([]);

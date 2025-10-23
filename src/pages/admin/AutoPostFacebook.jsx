@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { postToFacebook } from "../api/n8n";
+import { postToFacebook } from "../../api/n8n";
 
 export default function AutoPostFacebook() {
   const [form, setForm] = useState({
