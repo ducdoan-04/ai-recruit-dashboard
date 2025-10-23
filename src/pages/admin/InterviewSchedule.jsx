@@ -28,15 +28,47 @@ export default function InterviewSchedule() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">📅 Lịch phỏng vấn tuần này</h2>
-      <div className="bg-white rounded-2xl p-4 shadow">
-        {loading && <p>Đang tải...</p>}
-        {error && <p className="text-red-600">{error}</p>}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center text-2xl">
+          📅
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">Lịch phỏng vấn tuần này</h2>
+          <p className="text-gray-600">Quản lý lịch phỏng vấn ứng viên</p>
+        </div>
+      </div>
+      
+      <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+        {loading && (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <svg className="animate-spin h-8 w-8 text-blue-600 mx-auto mb-2" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              <p className="text-gray-600">Đang tải lịch phỏng vấn...</p>
+            </div>
+          </div>
+        )}
+        
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">❌</span>
+              <span className="font-semibold">{error}</span>
+            </div>
+          </div>
+        )}
+        
         {!loading && !error && (
           events.length === 0 ? (
-            <p>Không có lịch phỏng vấn nào.</p>
+            <div className="text-center py-8">
+              <div className="text-6xl mb-4">📅</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Không có lịch phỏng vấn</h3>
+              <p className="text-gray-600">Chưa có lịch phỏng vấn nào được lên kế hoạch.</p>
+            </div>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {events.map((e, i) => {
                 const start = e?.start?.dateTime || e?.start?.date || e?.start;
                 const end = e?.end?.dateTime || e?.end?.date || e?.end;
@@ -45,14 +77,29 @@ export default function InterviewSchedule() {
                 const title = e?.summary || e?.title || "(No title)";
                 const location = e?.location || e?.conferenceData?.entryPoints?.[0]?.uri || "";
                 return (
-                  <li key={e.id || i} className="border-l-4 border-blue-500 pl-4">
-                    <p className="font-semibold">{title}</p>
-                    <p className="text-sm text-gray-600">
-                      {startStr} → {endStr}
-                    </p>
-                    {location && (
-                      <p className="text-sm text-gray-500">📍 {location}</p>
-                    )}
+                  <li key={e.id || i} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 pl-6 pr-4 py-4 rounded-lg hover:shadow-md transition-all duration-300">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-800 text-lg">{title}</p>
+                        <div className="mt-2 space-y-1">
+                          <p className="text-sm text-gray-600 flex items-center gap-2">
+                            <span className="text-blue-500">🕐</span>
+                            <span>{startStr} - {endStr}</span>
+                          </p>
+                          {location && (
+                            <p className="text-sm text-gray-600 flex items-center gap-2">
+                              <span className="text-green-500">📍</span>
+                              <span>{location}</span>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          Phỏng vấn
+                        </span>
+                      </div>
+                    </div>
                   </li>
                 );
               })}

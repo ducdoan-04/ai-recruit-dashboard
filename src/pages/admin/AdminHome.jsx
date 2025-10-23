@@ -48,9 +48,15 @@ export default function AdminHome() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-indigo-700 mb-6">
-        🤖 AI Recruit Dashboard
-      </h1>
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center">
+          <span className="text-3xl">🤖</span>
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">AI Recruit Dashboard</h1>
+          <p className="text-gray-600">Quản lý ứng viên và thống kê AI tuyển dụng</p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <StatsCard 
