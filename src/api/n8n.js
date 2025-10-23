@@ -1,7 +1,10 @@
 import axios from "axios";
 
+// Read base URL from Vite env (import.meta.env). If not present, fall back to the public domain.
+const BASE_URL = import.meta.env.VITE_N8N_BASE_URL || "https://n8n.airecruit.io.vn";
+
 const n8n = axios.create({
-  baseURL: "/api/n8n", // Use proxy
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -11,7 +14,7 @@ const n8n = axios.create({
 export const postToFacebook = async (data) => {
   try {
     console.log("Posting to Facebook:", data);
-    console.log("Proxy URL:", n8n.defaults.baseURL + "/webhook/job-post");
+    console.log("Webhook URL:", n8n.defaults.baseURL + "/webhook/job-post");
     const res = await n8n.post("/webhook/job-post", data);
     console.log("Facebook post response:", res.data);
     return res.data;
@@ -28,7 +31,7 @@ export const postToFacebook = async (data) => {
 export const postToTwitter = async (data) => {
   try {
     console.log("Posting to Twitter:", data);
-    console.log("Proxy URL:", n8n.defaults.baseURL + "/webhook/post-twitter");
+    console.log("Webhook URL:", n8n.defaults.baseURL + "/webhook/post-twitter");
     const res = await n8n.post("/webhook/post-twitter", data);
     console.log("Twitter post response:", res.data);
     return res.data;
@@ -44,7 +47,7 @@ export const postToTwitter = async (data) => {
 // Lấy lịch phỏng vấn tuần này từ n8n (Webhook trả về { events: [...] })
 export const getInterviewSchedule = async () => {
   try {
-    console.log("Fetching schedule via proxy:", n8n.defaults.baseURL + "/webhook/get-schedule");
+    console.log("Fetching schedule from:", n8n.defaults.baseURL + "/webhook/get-schedule");
     const res = await n8n.get("/webhook/get-schedule");
     const data = res?.data ?? {};
     if (Array.isArray(data)) return data;
@@ -62,10 +65,7 @@ export const getCandidates = async () => {
   try {
     console.log("Fetching candidates from n8n");
     console.log("Base URL:", n8n.defaults.baseURL);
-    console.log(
-      "Full URL will be:",
-      n8n.defaults.baseURL + "/webhook/getCandidates"
-    );
+    console.log("Full URL will be:", n8n.defaults.baseURL + "/webhook/getCandidates");
     const res = await n8n.get("/webhook/getCandidates");
     console.log("Candidates response:", res.data);
     return res.data;
