@@ -10,6 +10,8 @@ import PostWebsite from './pages/admin/PostWebsite';
 import InterviewSchedule from './pages/admin/InterviewSchedule';
 import Settings from './pages/admin/Settings';
 import UserNavbar from './components/UserNavbar';
+import FacebookChatSimple from './components/FacebookChatSimple';
+import FacebookChatTest from './components/FacebookChatTest';
 import About from './pages/user/About';
 import Services from './pages/user/Services';
 import Projects from './pages/user/Projects';
@@ -23,55 +25,63 @@ import Contact from './pages/user/Contact';
  */
 export default function App() {
   return (
-    <Routes>
-      {/* Root redirect to admin */}
-      <Route path="/" element={<Navigate to="/about" replace />} />
+    <>
+      <Routes>
+        {/* Root redirect to admin */}
+        <Route path="/" element={<Navigate to="/about" replace />} />
 
-      {/* Admin Login Route (public) */}
-      <Route path="/admin/login" element={<AdminLogin />} />
+        {/* Admin Login Route (public) */}
+        <Route path="/admin/login" element={<AdminLogin />} />
 
-      {/* Protected Admin Routes */}
-      <Route
-        path="/admin"
-        element={
-          <AuthGuard>
-            <AdminLayout />
-          </AuthGuard>
-        }
-      >
-        {/* Admin sub-routes */}
-        <Route path="home" element={<AdminHome />} />
-        <Route path="post-facebook" element={<PostFacebook />} />
-        <Route path="post-linkedin" element={<PostLinkedIn />} />
-        <Route path="post-twitter" element={<PostTwitter />} />
-        <Route path="post-website" element={<PostWebsite />} />
-        <Route path="interview-schedule" element={<InterviewSchedule />} />
-        <Route path="settings" element={<Settings />} />
-      </Route>
+        {/* Protected Admin Routes */}
+        <Route
+          path="/admin"
+          element={
+            <AuthGuard>
+              <AdminLayout />
+            </AuthGuard>
+          }
+        >
+          {/* Admin sub-routes */}
+          <Route path="home" element={<AdminHome />} />
+          <Route path="post-facebook" element={<PostFacebook />} />
+          <Route path="post-linkedin" element={<PostLinkedIn />} />
+          <Route path="post-twitter" element={<PostTwitter />} />
+          <Route path="post-website" element={<PostWebsite />} />
+          <Route path="interview-schedule" element={<InterviewSchedule />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
 
-      {/* User public routes */}
-      <Route
-        path="/*"
-        element={
-          <div className="min-h-screen bg-gray-50">
-            <UserNavbar />
-            <div className="pt-8">
-              <Routes>
-                <Route path="/about" element={<About />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/projects" element={<Projects />} />
-                <Route path="/knowledge" element={<Knowledge />} />
-                <Route path="/careers" element={<Careers />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="*" element={<About />} />
-              </Routes>
+        {/* User public routes */}
+        <Route
+          path="/*"
+          element={
+            <div className="min-h-screen bg-gray-50">
+              <UserNavbar />
+              <div className="pt-8">
+                <Routes>
+                  <Route path="/about" element={<About />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/projects" element={<Projects />} />
+                  <Route path="/knowledge" element={<Knowledge />} />
+                  <Route path="/careers" element={<Careers />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="*" element={<About />} />
+                </Routes>
+              </div>
             </div>
-          </div>
-        }
-      />
+          }
+        />
 
-      {/* 404 - Redirect to admin home */}
-      <Route path="*" element={<Navigate to="/admin" replace />} />
-    </Routes>
+        {/* 404 - Redirect to admin home */}
+        <Route path="*" element={<Navigate to="/admin" replace />} />
+      </Routes>
+      
+      {/* Facebook Customer Chat Plugin - Available on all pages */}
+      <FacebookChatSimple />
+      
+      {/* Debug component - Remove in production */}
+      <FacebookChatTest />
+    </>
   );
 }
