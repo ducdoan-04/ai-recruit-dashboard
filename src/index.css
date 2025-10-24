@@ -10,4 +10,32 @@
   .animate-fadeIn {
     animation: fadeIn 0.25s ease-in-out;
   }
+
+/* Facebook Customer Chat - Preserve chat history when closing */
+/* Hide the dialog when it's minimized instead of destroying it */
+.fb_dialog.fb_dialog_advanced {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fb_dialog.fb_dialog_advanced[style*="display: none"] {
+  /* Keep the iframe loaded but hidden */
+  display: block !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(20px) scale(0.95) !important;
+}
+
+/* Ensure chat history is preserved */
+.fb_customer_chat_bounce_in_v2,
+.fb_customer_chat_bounce_out_v2 {
+  /* Don't remove iframe on animation */
+  display: block !important;
+}
+
+/* Keep iframe mounted to preserve state */
+iframe.fb_customer_chat_bounce_out_v2 {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(20px) scale(0.95) !important;
+}
   

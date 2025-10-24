@@ -16,6 +16,8 @@ import Projects from './pages/user/Projects';
 import Knowledge from './pages/user/Knowledge';
 import Careers from './pages/user/Careers';
 import Contact from './pages/user/Contact';
+import ChatDemo from './pages/ChatDemo';
+import N8nChatWidget from './components/N8nChatWidget';
 
 /**
  * Main App Component with React Router
@@ -64,6 +66,7 @@ export default function App() {
                   <Route path="/knowledge" element={<Knowledge />} />
                   <Route path="/careers" element={<Careers />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/chat-demo" element={<ChatDemo />} />
                   <Route path="*" element={<About />} />
                 </Routes>
               </div>
@@ -75,6 +78,8 @@ export default function App() {
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
       
+      {/* n8n Official Chat Widget */}
+          <N8nChatWidget />
     </>
   );
 }
