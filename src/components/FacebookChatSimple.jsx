@@ -53,12 +53,15 @@ export default function FacebookChatSimple() {
         version: 'v18.0'
       });
       console.log('FacebookChatSimple: Facebook SDK initialized');
+      
+      // Load Customer Chat plugin after SDK is ready
+      loadCustomerChatPlugin();
     };
 
     // Load Facebook SDK script
     const script = document.createElement('script');
     script.id = 'facebook-jssdk';
-    script.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
+    script.src = 'https://connect.facebook.net/en_US/sdk.js';
     script.async = true;
     script.defer = true;
     script.onload = () => {
@@ -69,10 +72,39 @@ export default function FacebookChatSimple() {
     };
     document.head.appendChild(script);
 
+    // Function to load Customer Chat plugin
+    const loadCustomerChatPlugin = () => {
+      console.log('FacebookChatSimple: Loading Customer Chat plugin...');
+      
+      // Load Customer Chat plugin script
+      if (!document.getElementById('facebook-customer-chat-plugin')) {
+        const pluginScript = document.createElement('script');
+        pluginScript.id = 'facebook-customer-chat-plugin';
+        pluginScript.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
+        pluginScript.async = true;
+        pluginScript.defer = true;
+        pluginScript.onload = () => {
+          console.log('FacebookChatSimple: Customer Chat plugin loaded');
+          // Parse the chat widget after plugin is loaded
+          if (window.FB && window.FB.XFBML) {
+            console.log('FacebookChatSimple: Parsing XFBML...');
+            window.FB.XFBML.parse();
+          }
+        };
+        pluginScript.onerror = (error) => {
+          console.error('FacebookChatSimple: Error loading Customer Chat plugin:', error);
+        };
+        document.head.appendChild(pluginScript);
+      }
+    };
+
     // Cleanup function
     return () => {
       const script = document.getElementById('facebook-jssdk');
       if (script) script.remove();
+      
+      const pluginScript = document.getElementById('facebook-customer-chat-plugin');
+      if (pluginScript) pluginScript.remove();
       
       const root = document.getElementById('fb-root');
       if (root) root.remove();

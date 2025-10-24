@@ -10,8 +10,6 @@ import PostWebsite from './pages/admin/PostWebsite';
 import InterviewSchedule from './pages/admin/InterviewSchedule';
 import Settings from './pages/admin/Settings';
 import UserNavbar from './components/UserNavbar';
-import FacebookChatSimple from './components/FacebookChatSimple';
-import FacebookChatTest from './components/FacebookChatTest';
 import About from './pages/user/About';
 import Services from './pages/user/Services';
 import Projects from './pages/user/Projects';
@@ -77,11 +75,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
       
-      {/* Facebook Customer Chat Plugin - Available on all pages */}
-      <FacebookChatSimple />
-      
-      {/* Debug component - Remove in production */}
-      <FacebookChatTest />
     </>
   );
 }
