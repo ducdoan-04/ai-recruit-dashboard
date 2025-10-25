@@ -92,3 +92,20 @@ export const postToWebsite = async (data) => {
     throw err;
   }
 };
+
+// Gửi job post threads đến n8n workflow
+export const postJobThreads = async (data) => {
+  try {
+    console.log("Posting Job Threads:", data);
+    console.log("Webhook URL:", n8n.defaults.baseURL + "/webhook/post-threads");
+    const res = await n8n.post("/webhook/post-threads", data);
+    console.log("Job Threads post response:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error("Error posting Job Threads:", err);
+    console.error("Error status:", err.response?.status);
+    console.error("Error data:", err.response?.data);
+    console.error("Error config:", err.config);
+    throw err;
+  }
+};

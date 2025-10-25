@@ -6,6 +6,7 @@ import AdminHome from './pages/admin/AdminHome';
 import PostFacebook from './pages/admin/PostFacebook';
 import PostLinkedIn from './pages/admin/PostLinkedIn';
 import PostTwitter from './pages/admin/PostTwitter';
+import JobPostThreads from './pages/admin/JobPostThreads';
 import PostWebsite from './pages/admin/PostWebsite';
 import InterviewSchedule from './pages/admin/InterviewSchedule';
 import Settings from './pages/admin/Settings';
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="post-facebook" element={<PostFacebook />} />
           <Route path="post-linkedin" element={<PostLinkedIn />} />
           <Route path="post-twitter" element={<PostTwitter />} />
+          <Route path="job-post-threads" element={<JobPostThreads />} />
           <Route path="post-website" element={<PostWebsite />} />
           <Route path="interview-schedule" element={<InterviewSchedule />} />
           <Route path="settings" element={<Settings />} />

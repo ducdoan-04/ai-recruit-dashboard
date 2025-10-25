@@ -22,6 +22,7 @@ export default function AdminLayout() {
     { path: '/admin/post-facebook', label: 'Auto Post - Facebook', icon: '📘', color: 'from-blue-500 to-blue-600' },
     { path: '/admin/post-linkedin', label: 'Auto Post - LinkedIn', icon: '💼', color: 'from-blue-600 to-blue-700' },
     { path: '/admin/post-twitter', label: 'Auto Post - Twitter', icon: '🐦', color: 'from-cyan-400 to-cyan-500' },
+    { path: '/admin/job-post-threads', label: 'Job Post Threads', icon: '📱', color: 'from-purple-400 to-purple-500' },
     { path: '/admin/post-website', label: 'Auto Post - Website', icon: '🌐', color: 'from-indigo-400 to-indigo-500' },
     { path: '/admin/interview-schedule', label: 'Interview Schedule', icon: '📅', color: 'from-red-400 to-red-500' },
     { path: '/admin/settings', label: 'Settings', icon: '⚙️', color: 'from-gray-400 to-gray-500' },
