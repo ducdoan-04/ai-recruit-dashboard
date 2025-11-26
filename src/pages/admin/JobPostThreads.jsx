@@ -5,14 +5,10 @@ export default function JobPostThreads() {
   const [form, setForm] = useState({
     title: "",
     company: "Airecruit",
-    link: "",
+    location: "",
     requirements: "",
     benefits: "",
-    location: "",
-    salary: "",
-    experience: "",
-    jobType: "Full-time",
-    schedule: "", // optional schedule
+    link: "",
   });
   const [loading, setLoading] = useState(false);
   const [lastError, setLastError] = useState(null);
@@ -26,8 +22,8 @@ export default function JobPostThreads() {
   };
 
   const generatePreview = () => {
-    const { title, company, location, salary, experience, jobType, requirements, benefits, link } = form;
-    
+    const { title, company, location, requirements, benefits, link } = form;
+
     if (!title.trim()) {
       setPreview("");
       return;
@@ -35,25 +31,22 @@ export default function JobPostThreads() {
 
     let previewText = `🚀 ${title}\n\n`;
     previewText += `🏢 ${company}\n`;
-    if (location) previewText += `📍 ${location}\n`;
-    if (salary) previewText += `💰 ${salary}\n`;
-    if (experience) previewText += `👨‍💼 ${experience}\n`;
-    if (jobType) previewText += `⏰ ${jobType}\n\n`;
-    
+    if (location) previewText += `📍 ${location}\n\n`;
+
     if (requirements) {
       previewText += `📋 Yêu cầu:\n${requirements}\n\n`;
     }
-    
+
     if (benefits) {
       previewText += `✨ Quyền lợi:\n${benefits}\n\n`;
     }
-    
+
     if (link) {
       previewText += `🔗 Ứng tuyển: ${link}\n\n`;
     }
-    
+
     previewText += `#TuyenDung #Jobs #Career #Vietnam`;
-    
+
     setPreview(previewText);
   };
 
@@ -61,14 +54,10 @@ export default function JobPostThreads() {
     setForm({
       title: "",
       company: "Airecruit",
-      link: "",
+      location: "",
       requirements: "",
       benefits: "",
-      location: "",
-      salary: "",
-      experience: "",
-      jobType: "Full-time",
-      schedule: "",
+      link: "",
     });
     setLastError(null);
     setMsg("");
@@ -90,14 +79,10 @@ export default function JobPostThreads() {
       const payload = {
         title: form.title,
         company: form.company,
-        link: form.link,
+        location: form.location,
         requirements: form.requirements,
         benefits: form.benefits,
-        location: form.location,
-        salary: form.salary,
-        experience: form.experience,
-        jobType: form.jobType,
-        schedule_time: form.schedule || undefined,
+        link: form.link,
         platform: "threads",
         thread_mode: true, // Enable thread mode
       };
@@ -119,20 +104,15 @@ export default function JobPostThreads() {
     }
   };
 
-  const jobTypes = [
-    "Full-time",
-    "Part-time", 
-    "Contract",
-    "Internship",
-    "Freelance",
-    "Remote"
-  ];
-
   return (
     <div className="p-6 bg-white rounded-xl shadow-md w-full max-w-4xl mx-auto mt-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">📱 Job Post Threads - Twitter</h2>
-        <p className="text-gray-600">Tạo job posting dạng thread trên Twitter với format chuyên nghiệp</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          📱 Auto Posting - Threads
+        </h2>
+        <p className="text-gray-600">
+          Đăng tin tuyển dụng tự động lên Threads với format chuyên nghiệp
+        </p>
       </div>
 
       {lastError && (
@@ -142,7 +122,13 @@ export default function JobPostThreads() {
       )}
 
       {msg && (
-        <div className={`mb-4 p-3 rounded ${msg.includes('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+        <div
+          className={`mb-4 p-3 rounded ${
+            msg.includes("✅")
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+          }`}
+        >
           <p className="text-sm">{msg}</p>
         </div>
       )}
@@ -150,10 +136,14 @@ export default function JobPostThreads() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Form */}
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">📝 Thông tin Job</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-700">
+            📝 Thông tin Job
+          </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề Job *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tiêu đề Job *
+              </label>
               <input
                 name="title"
                 value={form.title}
@@ -166,7 +156,9 @@ export default function JobPostThreads() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Công ty</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Công ty
+                </label>
                 <input
                   name="company"
                   value={form.company}
@@ -176,7 +168,9 @@ export default function JobPostThreads() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Địa điểm</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Địa điểm
+                </label>
                 <input
                   name="location"
                   value={form.location}
@@ -187,45 +181,10 @@ export default function JobPostThreads() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mức lương</label>
-                <input
-                  name="salary"
-                  value={form.salary}
-                  onChange={handleChange}
-                  placeholder="15-25 triệu VNĐ"
-                  className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Kinh nghiệm</label>
-                <input
-                  name="experience"
-                  value={form.experience}
-                  onChange={handleChange}
-                  placeholder="2-3 năm kinh nghiệm"
-                  className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Loại hình công việc</label>
-              <select
-                name="jobType"
-                value={form.jobType}
-                onChange={handleChange}
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {jobTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Yêu cầu công việc</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Yêu cầu công việc
+              </label>
               <textarea
                 name="requirements"
                 value={form.requirements}
@@ -237,7 +196,9 @@ export default function JobPostThreads() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Quyền lợi</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Quyền lợi
+              </label>
               <textarea
                 name="benefits"
                 value={form.benefits}
@@ -249,23 +210,14 @@ export default function JobPostThreads() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Link ứng tuyển</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Link ứng tuyển
+              </label>
               <input
                 name="link"
                 value={form.link}
                 onChange={handleChange}
                 placeholder="https://careers.company.com/apply"
-                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Thời gian đăng (tùy chọn)</label>
-              <input
-                type="datetime-local"
-                name="schedule"
-                value={form.schedule}
-                onChange={handleChange}
                 className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -292,7 +244,9 @@ export default function JobPostThreads() {
 
         {/* Preview */}
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">👀 Preview Twitter Thread</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-700">
+            👀 Preview Threads Post
+          </h3>
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 min-h-[400px]">
             {preview ? (
               <div className="whitespace-pre-wrap text-sm text-gray-800 font-mono leading-relaxed">
@@ -304,11 +258,12 @@ export default function JobPostThreads() {
               </div>
             )}
           </div>
-          
+
           {preview && (
             <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-700">
-                <strong>💡 Tip:</strong> Thread sẽ được chia thành nhiều tweet để phù hợp với giới hạn ký tự của Twitter
+                <strong>💡 Tip:</strong> Bài viết sẽ được đăng lên Threads với
+                định dạng chuyên nghiệp
               </p>
             </div>
           )}
