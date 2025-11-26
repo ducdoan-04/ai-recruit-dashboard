@@ -10,7 +10,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        16,
+        -48,
         -16
       ],
       "id": "5e674a92-4f38-44bd-845a-650c504edd61",
@@ -26,7 +26,7 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.7,
       "position": [
-        256,
+        192,
         -16
       ],
       "id": "c4ccc381-91a5-4902-81bd-acad12b27ca1",
@@ -44,7 +44,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        256,
+        272,
         160
       ],
       "id": "1403996d-4bd4-4557-98ff-5250f58fb21b",
@@ -63,7 +63,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        608,
+        496,
         -16
       ],
       "id": "c00983cc-048c-464c-aa4f-8a7102cf9448",
@@ -85,16 +85,17 @@
       "typeVersion": 1,
       "position": [
         816,
-        -16
+        -464
       ],
       "id": "dab3def2-38cd-4ccb-9190-497d23d4027b",
       "name": "Generate an image",
       "credentials": {
         "googlePalmApi": {
-          "id": "qIkcTUbf9DHnPutN",
-          "name": "Google Gemini Api  - Bot Chat"
+          "id": "kKDl67bbcmCjJSZf",
+          "name": "Google Gemini(PaLM) Api account 2"
         }
-      }
+      },
+      "disabled": true
     },
     {
       "parameters": {
@@ -115,7 +116,7 @@
             },
             {
               "name": "access_token",
-              "value": "EAAaoEXjsC9YBP7JGz9yG0npKO6xvhUA65IFlDhyPPjhXcUA9tRiZBGoJCKeqGB8O8umdcI3lQqw8Q6bn1WOWJs0DHNWDqRMtp1XFQIZB1lLt1mYh5izH7VB0qChK8OfGvbwrgxpH0wtup7ZC17NNwpiJ2Lqg8aG7530LHckzHynlyonk5TJVBZBIm50ayK2AAWOy"
+              "value": "YOUR_FB_PAGE_ACCESS_TOKEN"
             },
             {
               "name": "published",
@@ -191,7 +192,7 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1920,
+        2112,
         -80
       ],
       "id": "8bfc54b9-fc4a-43a3-b533-66aae50f07ce",
@@ -229,7 +230,7 @@
             },
             {
               "name": "access_token",
-              "value": "EAAaoEXjsC9YBP7JGz9yG0npKO6xvhUA65IFlDhyPPjhXcUA9tRiZBGoJCKeqGB8O8umdcI3lQqw8Q6bn1WOWJs0DHNWDqRMtp1XFQIZB1lLt1mYh5izH7VB0qChK8OfGvbwrgxpH0wtup7ZC17NNwpiJ2Lqg8aG7530LHckzHynlyonk5TJVBZBIm50ayK2AAWOy"
+              "value": "YOUR_FB_PAGE_ACCESS_TOKEN"
             }
           ]
         },
@@ -254,7 +255,7 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1920,
+        1888,
         80
       ],
       "id": "190e3c2d-2476-4a26-9ac5-4dbf6ffc6278",
@@ -271,13 +272,13 @@
       "parameters": {
         "content": "#### XU LY",
         "height": 432,
-        "width": 976,
+        "width": 1040,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        192,
+        144,
         -128
       ],
       "id": "368b9d74-b7da-4773-ae2d-4ca3c4582655",
@@ -302,7 +303,7 @@
       "parameters": {
         "content": "#### THONG BAO\n",
         "height": 432,
-        "width": 464
+        "width": 592
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -312,6 +313,154 @@
       ],
       "id": "5a2c7cf2-4ca6-44e8-b788-8e956bb0d73a",
       "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ihtxxwitdibhlocwqhoq.supabase.co/rest/v1/fb_posting",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SUPABASE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_HF_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{ $('Webhook').item.json.body.title }}"
+            },
+            {
+              "name": "company",
+              "value": "={{ $('Webhook').item.json.body.company }}"
+            },
+            {
+              "name": "jd_link",
+              "value": "={{ $('Webhook').item.json.body.link }}\n"
+            },
+            {
+              "name": "requirements",
+              "value": "={{ $('Webhook').item.json.body.requirements }}\n"
+            },
+            {
+              "name": "benefits",
+              "value": "={{ $('Webhook').item.json.body.benefits }}\n"
+            },
+            {
+              "name": "schedule_time",
+              "value": "={{ $('Webhook').item.json.body.schedule_time }}\n"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('Code in JavaScript').item.json.caption }}\n"
+            },
+            {
+              "name": "fb_image_id",
+              "value": "={{ $('HTTP Request').item.json.id }}\n"
+            },
+            {
+              "name": "fb_post_id",
+              "value": "={{ $('HTTP Request1').item.json.id }}\n"
+            },
+            {
+              "name": "post_url",
+              "value": "={{ 'https://facebook.com/' + $('HTTP Request1').item.json.id }}\n"
+            },
+            {
+              "name": "status",
+              "value": "=success\n"
+            },
+            {
+              "name": "raw_request",
+              "value": "={{ $('Webhook').item.json.body }}\n"
+            },
+            {
+              "name": "raw_fb_response",
+              "value": "={{ $('HTTP Request1').item.json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1888,
+        -80
+      ],
+      "id": "46a230e2-48b5-49c0-ab64-975380980b93",
+      "name": "Save to Supabase"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "text": "=We are hiring: {{ $('Webhook').item.json.body.title }}\nJoin {{ $('Webhook').item.json.body.company }} commpany today!\n",
+        "fontSize": 45,
+        "fontColor": "#FFFFFF",
+        "positionX": 200,
+        "positionY": 900,
+        "lineLength": 45,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        848,
+        -16
+      ],
+      "id": "4b2503df-d658-4647-b6a7-bf9a9897b0b1",
+      "name": "Edit Image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SUPABASE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "image/png"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"inputs\": \"Professional recruitment poster, 9:16 vertical. Blue modern tech office background, soft futuristic lighting. Add clear, readable white text in bold font: 'Hiring {{ $('Webhook').item.json.body.title }}'. Add smaller subtitle: 'Company: {{ $('Webhook').item.json.body.company }}'. Design like a corporate HR poster. Keep layout clean, modern, with high readability.\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        688,
+        -16
+      ],
+      "id": "36bf1181-7a38-4018-8957-818c74e1acd8",
+      "name": "Generate Image HF"
     }
   ],
   "pinData": {},
@@ -353,7 +502,7 @@
       "main": [
         [
           {
-            "node": "Generate an image",
+            "node": "Generate Image HF",
             "type": "main",
             "index": 0
           }
@@ -362,13 +511,7 @@
     },
     "Generate an image": {
       "main": [
-        [
-          {
-            "node": "MergeImageData",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "MergeImageData": {
@@ -397,7 +540,7 @@
       "main": [
         [
           {
-            "node": "Send a message",
+            "node": "Save to Supabase",
             "type": "main",
             "index": 0
           }
@@ -421,13 +564,46 @@
           }
         ]
       ]
+    },
+    "Save to Supabase": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Image": {
+      "main": [
+        [
+          {
+            "node": "MergeImageData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image HF": {
+      "main": [
+        [
+          {
+            "node": "Edit Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "6254fe75-32e5-4f6a-90ab-ad5b1be15c97",
+  "versionId": "2d3b2735-b365-4d70-a091-94b66a3bb5fc",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "5236a31aca501ad1719e9f2baf9c104efd8f2de458541de77d8ef16691d34e62"
