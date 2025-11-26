@@ -1,4 +1,5 @@
 import axios from "axios";
+import { uploadThreadPostToSupabase } from "./threadPostService.js";
 
 // Read base URL from Vite env (import.meta.env). If not present, fall back to the public domain.
 const BASE_URL =
@@ -115,25 +116,25 @@ export const postJobThreads = async (data) => {
 
     // 2️⃣ Tự động upload response vào Supabase
     console.log("📤 Tự động upload response vào Supabase...");
-    const backendUrl = "/api/webhook/post-threads";
 
-    const uploadRes = await axios.post(backendUrl, {
-      title: res.data.title,
-      company: res.data.company,
-      location: res.data.location,
-      requirements: res.data.requirements,
-      benefits: res.data.benefits,
-      company_website: res.data.company_website,
-      image_url: res.data.image_url,
-      caption: res.data.caption,
-      status: res.data.status || "posted",
+    const uploadRes = await uploadThreadPostToSupabase({
+      title: res.data?.title || data.title || "",
+      company: res.data?.company || data.company || "Airecruit",
+      location: res.data?.location || data.location || null,
+      requirements: res.data?.requirements || data.requirements || null,
+      benefits: res.data?.benefits || data.benefits || null,
+      company_website:
+        res.data?.company_website || res.data?.link || data.link || null,
+      image_url: res.data?.image_url || null,
+      caption: res.data?.caption || null,
+      status: res.data?.status || "posted",
     });
 
-    console.log("✅ Uploaded to Supabase:", uploadRes.data);
+    console.log("✅ Uploaded to Supabase:", uploadRes);
 
     return {
       n8nResponse: res.data,
-      supabaseResponse: uploadRes.data,
+      supabaseResponse: uploadRes,
     };
   } catch (err) {
     console.error("Error posting Job Threads:", err);
