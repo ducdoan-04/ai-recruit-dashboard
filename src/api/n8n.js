@@ -93,7 +93,7 @@ export const postToWebsite = async (data) => {
   }
 };
 
-// Gửi job post threads đến n8n workflow
+// Gửi job post threads đến n8n workflowhttps://n8n.airecruit.io.vn/webhook-test/post-threads
 export const postJobThreads = async (data) => {
   try {
     console.log("Posting Job Threads:", data);
