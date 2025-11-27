@@ -1,0 +1,613 @@
+{
+  "name": "Job Posting FB",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-post",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        -16
+      ],
+      "id": "5e674a92-4f38-44bd-845a-650c504edd61",
+      "name": "Webhook",
+      "webhookId": "5a7a6fb1-8963-41e0-89d0-52ba016eacb1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Bạn là chuyên viên tuyển dụng. Viết caption ngắn hấp dẫn để đăng Facebook cho job {{ $json.body.title }} tại công ty {{ $json.body.company }}.\n\nYêu cầu: {{ $json.body.requirements }}\nQuyền lợi: {{ $json.body.benefits }}\nLink JD: {{ $json.body.link }}\n\nGiọng văn tự nhiên, có emoji, kết thúc bằng CTA mời ứng tuyển.\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        192,
+        -16
+      ],
+      "id": "c4ccc381-91a5-4902-81bd-acad12b27ca1",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        160
+      ],
+      "id": "1403996d-4bd4-4557-98ff-5250f58fb21b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "b0cuUZS0kLTTpRuC",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Lấy dữ liệu đầu vào\nconst input = $input.first();\nconst webhook = $node[\"Webhook\"].json.body || {};\n\nconst jobTitle = webhook.job_title || \"Không xác định\";\nconst data = input.json.text || \"\";\n\n// Tạo caption cuối\nreturn [\n  {\n    json: {\n      caption: `${data}\\n\\nTuyển dụng #${jobTitle.replace(/[\\s#]/g, '')}`,\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        -16
+      ],
+      "id": "c00983cc-048c-464c-aa4f-8a7102cf9448",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash-exp-image-generation",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash-exp-image-generation"
+        },
+        "prompt": "=Create a clean recruitment poster background for {{$json.caption}} \nbut DO NOT add any text or captions on the image. \nFocus on modern tech office background, blue color palette, minimal futuristic design, \nlighting from windows, suitable for overlaying text later. \nAspect ratio 9:16.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        816,
+        -464
+      ],
+      "id": "dab3def2-38cd-4ccb-9190-497d23d4027b",
+      "name": "Generate an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "kKDl67bbcmCjJSZf",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v24.0/830352943493751/photos",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "caption",
+              "value": "={{ $('Code in JavaScript').item.json.caption }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "source",
+              "inputDataFieldName": "=data"
+            },
+            {
+              "name": "access_token",
+              "value": "YOUR_FB_PAGE_ACCESS_TOKEN"
+            },
+            {
+              "name": "published",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1248,
+        -16
+      ],
+      "id": "9b67f132-e3d6-4e37-9bb1-decdf8a58eee",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Nhận dữ liệu\nconst image = $input.item.binary.data;\nconst prev = $node[\"Code in JavaScript\"].json;\n\nreturn [\n  {\n    json: {\n      ...prev,\n      status: \"ready_to_post\",\n      updated_at: new Date().toISOString()\n    },\n    binary: {\n      data: image\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        -16
+      ],
+      "id": "b2842d72-8883-4335-805c-6856e7b903e6",
+      "name": "MergeImageData"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cb2b0996-11a3-402d-86e2-5c41da90cc8a",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1664,
+        -16
+      ],
+      "id": "13855d19-40d4-4847-a89f-637b65a07b46",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "lengochuy1104@gmail.com",
+        "subject": "=✅ Job post scheduled successfully: {{$json.id }}",
+        "message": "=<b>Job Title:</b> {{ $('Webhook').item.json.body.title }}<br/>\n<b>Scheduled Time:</b> {{ $('Webhook').item.json.body.schedule_time }}<br/>\n<b>Facebook Post ID:</b> {{ $json.id }}<br/><br/> \nBài đăng đã được lên lịch thành công 🎉",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2112,
+        -80
+      ],
+      "id": "8bfc54b9-fc4a-43a3-b533-66aae50f07ce",
+      "name": "Send a message",
+      "webhookId": "24a69a37-9f55-430a-81aa-033703d2efb9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "HfmTBMydPEtPT7ab",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v24.0/830352943493751/feed",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $('Code in JavaScript').item.json.caption }}"
+            },
+            {
+              "name": "attached_media[0]",
+              "value": "={\"media_fbid\":\"{{ $('HTTP Request').item.json.id }}\"}"
+            },
+            {
+              "name": "published",
+              "value": "=false"
+            },
+            {
+              "name": "scheduled_publish_time",
+              "value": "={{ Math.floor((new Date($('Webhook').item.json.body.schedule_time).getTime() - 7*60*60*1000) / 1000) }}"
+            },
+            {
+              "name": "access_token",
+              "value": "YOUR_FB_PAGE_ACCESS_TOKEN"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1456,
+        -16
+      ],
+      "id": "c4600527-d357-426e-9294-5d9be9030eee",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "sendTo": "lengochuy1104@gmail.com",
+        "subject": "=✅ Job post scheduled failed!",
+        "message": "=<b>Job Title:</b> {{ $('Webhook').item.json.body.title }}<br/>\n<b>Scheduled Time:</b> {{ $('Webhook').item.json.body.schedule_time }}<br/>\nBài đăng thất bại!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1888,
+        80
+      ],
+      "id": "190e3c2d-2476-4a26-9ac5-4dbf6ffc6278",
+      "name": "Send a message1",
+      "webhookId": "24a69a37-9f55-430a-81aa-033703d2efb9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "HfmTBMydPEtPT7ab",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "#### XU LY",
+        "height": 432,
+        "width": 1040,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -128
+      ],
+      "id": "368b9d74-b7da-4773-ae2d-4ca3c4582655",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "#### POST FB\n",
+        "height": 432,
+        "width": 432
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -128
+      ],
+      "id": "c7a49eb8-1572-49cf-b3bf-bc6e51007387",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "#### THONG BAO\n",
+        "height": 432,
+        "width": 592
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        -128
+      ],
+      "id": "5a2c7cf2-4ca6-44e8-b788-8e956bb0d73a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ihtxxwitdibhlocwqhoq.supabase.co/rest/v1/fb_posting",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SUPABASE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_HF_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{ $('Webhook').item.json.body.title }}"
+            },
+            {
+              "name": "company",
+              "value": "={{ $('Webhook').item.json.body.company }}"
+            },
+            {
+              "name": "jd_link",
+              "value": "={{ $('Webhook').item.json.body.link }}\n"
+            },
+            {
+              "name": "requirements",
+              "value": "={{ $('Webhook').item.json.body.requirements }}\n"
+            },
+            {
+              "name": "benefits",
+              "value": "={{ $('Webhook').item.json.body.benefits }}\n"
+            },
+            {
+              "name": "schedule_time",
+              "value": "={{ $('Webhook').item.json.body.schedule_time }}\n"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('Code in JavaScript').item.json.caption }}\n"
+            },
+            {
+              "name": "fb_image_id",
+              "value": "={{ $('HTTP Request').item.json.id }}\n"
+            },
+            {
+              "name": "fb_post_id",
+              "value": "={{ $('HTTP Request1').item.json.id }}\n"
+            },
+            {
+              "name": "post_url",
+              "value": "={{ 'https://facebook.com/' + $('HTTP Request1').item.json.id }}\n"
+            },
+            {
+              "name": "status",
+              "value": "=success\n"
+            },
+            {
+              "name": "raw_request",
+              "value": "={{ $('Webhook').item.json.body }}\n"
+            },
+            {
+              "name": "raw_fb_response",
+              "value": "={{ $('HTTP Request1').item.json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1888,
+        -80
+      ],
+      "id": "46a230e2-48b5-49c0-ab64-975380980b93",
+      "name": "Save to Supabase"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "text": "=We are hiring: {{ $('Webhook').item.json.body.title }}\nJoin {{ $('Webhook').item.json.body.company }} commpany today!\n",
+        "fontSize": 45,
+        "fontColor": "#FFFFFF",
+        "positionX": 200,
+        "positionY": 900,
+        "lineLength": 45,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        848,
+        -16
+      ],
+      "id": "4b2503df-d658-4647-b6a7-bf9a9897b0b1",
+      "name": "Edit Image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SUPABASE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "image/png"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"inputs\": \"Professional recruitment poster, 9:16 vertical. Blue modern tech office background, soft futuristic lighting. Add clear, readable white text in bold font: 'Hiring {{ $('Webhook').item.json.body.title }}'. Add smaller subtitle: 'Company: {{ $('Webhook').item.json.body.company }}'. Design like a corporate HR poster. Keep layout clean, modern, with high readability.\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        688,
+        -16
+      ],
+      "id": "36bf1181-7a38-4018-8957-818c74e1acd8",
+      "name": "Generate Image HF"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Generate Image HF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        []
+      ]
+    },
+    "MergeImageData": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Save to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Supabase": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Image": {
+      "main": [
+        [
+          {
+            "node": "MergeImageData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image HF": {
+      "main": [
+        [
+          {
+            "node": "Edit Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2d3b2735-b365-4d70-a091-94b66a3bb5fc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5236a31aca501ad1719e9f2baf9c104efd8f2de458541de77d8ef16691d34e62"
+  },
+  "id": "nXPrWO3G1FIZTXRa",
+  "tags": []
+}
