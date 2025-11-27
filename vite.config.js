@@ -9,7 +9,7 @@ export default defineConfig({
 
     // ⚙️ Cho phép domain ngrok truy cập
     allowedHosts: [
-      "bok-noneatable-indefatigably.ngrok-free.dev", // domain hiện tại của bạn
+      "bok-noneatable-indefatigably.ngrok-free.dev", // domain hiện tại của bạn https://bok-noneatable-indefatigably.ngrok-free.dev
     ],
 
     // ⚙️ Proxy tới server n8n
