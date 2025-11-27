@@ -19,6 +19,7 @@ import Careers from './pages/user/Careers';
 import Contact from './pages/user/Contact';
 import ChatDemo from './pages/ChatDemo';
 import N8nChatWidget from './components/N8nChatWidget';
+import DatasheetFAQ from './pages/admin/DatasheetFAQ';
 
 /**
  * Main App Component with React Router
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="post-website" element={<PostWebsite />} />
           <Route path="interview-schedule" element={<InterviewSchedule />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="faq" element={<DatasheetFAQ />} />
         </Route>
 
         {/* User public routes */}

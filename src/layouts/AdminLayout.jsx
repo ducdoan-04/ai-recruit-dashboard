@@ -25,6 +25,7 @@ export default function AdminLayout() {
     { path: '/admin/job-post-threads', label: 'Job Post Threads', icon: '📱', color: 'from-purple-400 to-purple-500' },
     { path: '/admin/post-website', label: 'Auto Post - Website', icon: '🌐', color: 'from-indigo-400 to-indigo-500' },
     { path: '/admin/interview-schedule', label: 'Interview Schedule', icon: '📅', color: 'from-red-400 to-red-500' },
+    { path: '/admin/faq', label: 'Quản lý FAQ', icon: '📋', color: 'from-green-400 to-green-500' },
     { path: '/admin/settings', label: 'Settings', icon: '⚙️', color: 'from-gray-400 to-gray-500' },
   ];
 
