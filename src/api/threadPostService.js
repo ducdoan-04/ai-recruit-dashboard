@@ -1,11 +1,12 @@
-import { createClient } from "@supabase/supabase-js";
+// import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabaseClient";
 
 // Khởi tạo Supabase client
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL || "https://ihtxxwitdibhlocwqhoq.supabase.co",
-  process.env.VITE_SUPABASE_ANON_KEY ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlodHh4d2l0ZGliaGxvY3dxaG9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjM4MDIsImV4cCI6MjA3Njc5OTgwMn0.ThaJapdkbVQGy1ROYpdoSnpOVz9zkLaHW65n2yKWR74"
-);
+// const supabase = createClient(
+//   import.meta.env.VITE_SUPABASE_URL || "https://ihtxxwitdibhlocwqhoq.supabase.co",
+//   import.meta.env.VITE_SUPABASE_ANON_KEY ||
+//     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlodHh4d2l0ZGliaGxvY3dxaG9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjM4MDIsImV4cCI6MjA3Njc5OTgwMn0.ThaJapdkbVQGy1ROYpdoSnpOVz9zkLaHW65n2yKWR74"
+// );
 
 /**
  * Upload webhook response từ n8n vào Supabase
