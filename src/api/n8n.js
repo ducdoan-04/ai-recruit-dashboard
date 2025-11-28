@@ -1,5 +1,6 @@
 import axios from "axios";
 import { uploadThreadPostToSupabase } from "./threadPostService.js";
+import { supabase } from "../lib/supabaseClient";
 
 // Read base URL from Vite env (import.meta.env). If not present, fall back to the public domain.
 const BASE_URL =
@@ -83,6 +84,26 @@ export const getCandidates = async () => {
     throw err;
   }
 };
+
+// Lấy danh sách ứng viên không có CV
+export const getCandidatesNoCV = async () => {
+  try {
+    console.log("Fetching candidates from n8n");
+    console.log("Base URL:", n8n.defaults.baseURL);
+    console.log(
+      "Full URL will be:",
+      n8n.defaults.baseURL + "/webhook/getCandidatesNoCV"
+    );
+    const res = await n8n.get("/webhook/getCandidatesNoCV");
+    console.log("Candidates response:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error("Error fetching candidates:", err);
+    console.error("Error config:", err.config);
+    throw err;
+  }
+};
+
 
 // Đăng tin tuyển dụng lên website
 export const postToWebsite = async (data) => {

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { getCandidates } from "../../api/n8n";
+import { getCandidates, getCandidatesNoCV } from "../../api/n8n";
 import StatsCard from "../../components/StatsCard";
 import CandidateTable from "../../components/CandidateTable";
+import CandidatesNoCVTable from "../../components/CandidatesNoCVTable";
 import Charts from "../../components/Charts";
 import { XMarkIcon, ArrowsPointingOutIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
@@ -10,18 +11,28 @@ import { XMarkIcon, ArrowsPointingOutIcon, ArrowDownTrayIcon } from '@heroicons/
  */
 export default function AdminHome() {
   const [candidates, setCandidates] = useState([]);
+  const [candidatesNoCV, setCandidatesNoCV] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCV, setSelectedCV] = useState(null);
 
   useEffect(() => {
-    getCandidates().then((data) => {
-      const list = Array.isArray(data)
-        ? data
-        : (data && (data.candidates || data.items || data.results)) || [];
+    Promise.all([
+      getCandidates(),
+      getCandidatesNoCV()
+    ]).then(([candidatesData, noCVData]) => {
+      const list = Array.isArray(candidatesData)
+        ? candidatesData
+        : (candidatesData && (candidatesData.candidates || candidatesData.items || candidatesData.results)) || [];
+      
+      const noCVList = Array.isArray(noCVData)
+        ? noCVData
+        : (noCVData && (noCVData.candidates || noCVData.items || noCVData.results)) || [];
+      
       setCandidates(list);
+      setCandidatesNoCV(noCVList);
       setLoading(false);
     }).catch((err) => {
-      console.error("Error loading candidates:", err);
+      console.error("Error loading data:", err);
       setLoading(false);
     });
   }, []);
@@ -86,6 +97,9 @@ export default function AdminHome() {
 
       <Charts candidates={candidatesList} />
       <CandidateTable candidates={candidatesList} onSelectCV={setSelectedCV} />
+      
+      {/* Thêm bảng ứng viên không có CV */}
+      <CandidatesNoCVTable candidates={candidatesNoCV} />
 
       {/* CV Preview Modal - Improved UI */}
       {selectedCV && (
