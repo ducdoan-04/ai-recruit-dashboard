@@ -20,6 +20,7 @@ import Contact from './pages/user/Contact';
 import ChatDemo from './pages/ChatDemo';
 import N8nChatWidget from './components/N8nChatWidget';
 import DatasheetFAQ from './pages/admin/DatasheetFAQ';
+import RulesCheckCV from './pages/admin/RulesCheckCV';
 
 /**
  * Main App Component with React Router
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="interview-schedule" element={<InterviewSchedule />} />
           <Route path="settings" element={<Settings />} />
           <Route path="faq" element={<DatasheetFAQ />} />
+          <Route path="rules-check-cv" element={<RulesCheckCV />} />
         </Route>
 
         {/* User public routes */}
