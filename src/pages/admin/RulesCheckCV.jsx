@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { PlusIcon, PencilIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Switch } from "../../components/ui/switch";
+import { toast } from "sonner";
 
 export default function RulesCheckCV() {
   const [rules, setRules] = useState([]);
@@ -23,7 +25,7 @@ export default function RulesCheckCV() {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('llm_rules') // Sửa từ 'n8n_rules' thành 'llm_rules'
+        .from('llm_rules')
         .select('*')
         .order('rule_name', { ascending: true });
 
@@ -32,6 +34,7 @@ export default function RulesCheckCV() {
     } catch (err) {
       console.error('Error fetching rules:', err);
       setError('Không thể tải danh sách rules');
+      toast.error('Không thể tải danh sách rules');
     } finally {
       setLoading(false);
     }
@@ -77,7 +80,7 @@ export default function RulesCheckCV() {
       if (editingRule) {
         // Update
         const { error } = await supabase
-          .from('llm_rules') // Sửa từ 'n8n_rules' thành 'llm_rules'
+          .from('llm_rules')
           .update({
             rule_name: form.rule_name,
             rule_text: form.rule_text,
@@ -86,17 +89,20 @@ export default function RulesCheckCV() {
           .eq('id', editingRule.id);
 
         if (error) throw error;
+        toast.success('Cập nhật rule thành công!');
         setSuccess('Cập nhật rule thành công!');
       } else {
-        // Create
+        // Create - mặc định is_active = false
         const { error } = await supabase
-          .from('llm_rules') // Sửa từ 'n8n_rules' thành 'llm_rules'
+          .from('llm_rules')
           .insert([{
             rule_name: form.rule_name,
-            rule_text: form.rule_text
+            rule_text: form.rule_text,
+            is_active: false
           }]);
 
         if (error) throw error;
+        toast.success('Thêm rule thành công!');
         setSuccess('Thêm rule thành công!');
       }
 
@@ -106,7 +112,9 @@ export default function RulesCheckCV() {
       }, 1500);
     } catch (err) {
       console.error('Error saving rule:', err);
-      setError('Có lỗi xảy ra khi lưu rule');
+      const errorMessage = 'Có lỗi xảy ra khi lưu rule';
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -116,18 +124,60 @@ export default function RulesCheckCV() {
 
     try {
       const { error } = await supabase
-        .from('llm_rules') // Sửa từ 'n8n_rules' thành 'llm_rules'
+        .from('llm_rules')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
+      toast.success('Xóa rule thành công!');
       setSuccess('Xóa rule thành công!');
       fetchRules();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       console.error('Error deleting rule:', err);
-      setError('Không thể xóa rule');
+      const errorMessage = 'Không thể xóa rule';
+      setError(errorMessage);
+      toast.error(errorMessage);
       setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  // Toggle active status (chỉ 1 rule active tại 1 thời điểm)
+  const toggleRuleActive = async (ruleId, currentState) => {
+    try {
+      // Nếu đang tắt rule này
+      if (currentState) {
+        const { error } = await supabase
+          .from("llm_rules")
+          .update({ is_active: false })
+          .eq("id", ruleId);
+
+        if (error) throw error;
+        toast.success("Đã tắt rule");
+      } else {
+        // Nếu đang bật rule này → tắt tất cả rule khác trước
+        const { error: deactivateError } = await supabase
+          .from("llm_rules")
+          .update({ is_active: false })
+          .neq("id", ruleId);
+
+        if (deactivateError) throw deactivateError;
+
+        // Sau đó bật rule này
+        const { error: activateError } = await supabase
+          .from("llm_rules")
+          .update({ is_active: true })
+          .eq("id", ruleId);
+
+        if (activateError) throw activateError;
+        toast.success("Rule đã được kích hoạt");
+      }
+
+      // Refresh data
+      fetchRules();
+    } catch (error) {
+      console.error("Toggle rule error:", error);
+      toast.error("Không thể thay đổi trạng thái rule");
     }
   };
 
@@ -186,6 +236,9 @@ export default function RulesCheckCV() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Nội dung Prompt
                 </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                  Active Rule
+                </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
                   Thao tác
                 </th>
@@ -202,6 +255,19 @@ export default function RulesCheckCV() {
                       {rule.rule_text}
                     </div>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <Switch
+                        checked={rule.is_active || false}
+                        onCheckedChange={() => 
+                          toggleRuleActive(rule.id, rule.is_active || false)
+                        }
+                      />
+                      {rule.is_active && (
+                        <span className="text-xs text-green-600 font-semibold">✓ Active</span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => openModal(rule)}
@@ -214,8 +280,9 @@ export default function RulesCheckCV() {
                       onClick={() => handleDelete(rule.id)}
                       className="text-red-600 hover:text-red-900"
                       title="Xóa"
+                      disabled={rule.is_active}
                     >
-                      <TrashIcon className="w-5 h-5 inline" />
+                      <TrashIcon className={`w-5 h-5 inline ${rule.is_active ? 'opacity-50 cursor-not-allowed' : ''}`} />
                     </button>
                   </td>
                 </tr>
@@ -273,7 +340,7 @@ export default function RulesCheckCV() {
                   value={form.rule_text}
                   onChange={handleChange}
                   required
-                  rows="15"
+                  rows={15}
                   placeholder="Nhập prompt chi tiết cho AI đánh giá CV..."
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm"
                 />

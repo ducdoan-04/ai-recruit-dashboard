@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import AuthGuard from './guards/AuthGuard';
 import AdminLayout from './layouts/AdminLayout';
 import AdminLogin from './pages/admin/AdminLogin';
@@ -29,6 +30,7 @@ import RulesCheckCV from './pages/admin/RulesCheckCV';
 export default function App() {
   return (
     <>
+      <Toaster position="top-right" richColors />
       <Routes>
         {/* Root redirect to admin */}
         <Route path="/" element={<Navigate to="/about" replace />} />
