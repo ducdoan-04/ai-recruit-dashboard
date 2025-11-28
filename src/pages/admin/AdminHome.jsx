@@ -3,6 +3,7 @@ import { getCandidates } from "../../api/n8n";
 import StatsCard from "../../components/StatsCard";
 import CandidateTable from "../../components/CandidateTable";
 import Charts from "../../components/Charts";
+import { XMarkIcon, ArrowsPointingOutIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 /**
  * AdminHome - Main dashboard page showing candidate statistics
@@ -46,6 +47,13 @@ export default function AdminHome() {
     ? (candidatesList.reduce((a, b) => a + Number(b.score || 0), 0) / total).toFixed(1)
     : "0.0";
 
+  // Lấy URL gốc từ Google Docs Viewer URL
+  const getOriginalUrl = (url) => {
+    if (!url) return null;
+    const match = url.match(/url=([^&]+)/);
+    return match ? decodeURIComponent(match[1]) : url;
+  };
+
   return (
     <div>
       <div className="flex items-center gap-4 mb-8">
@@ -79,29 +87,75 @@ export default function AdminHome() {
       <Charts candidates={candidatesList} />
       <CandidateTable candidates={candidatesList} onSelectCV={setSelectedCV} />
 
-      {/* CV Preview Modal */}
+      {/* CV Preview Modal - Improved UI */}
       {selectedCV && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fadeIn"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
           onClick={() => setSelectedCV(null)}
         >
           <div
-            className="bg-white rounded-xl p-4 w-[90%] h-[90%]"
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <iframe
-              src={selectedCV}
-              className="w-full h-full rounded-lg"
-              title="CV Preview"
-              allow="autoplay; fullscreen"
-              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-            />
-            <button
-              onClick={() => setSelectedCV(null)}
-              className="mt-3 px-4 py-2 bg-red-500 text-white rounded-lg float-right hover:bg-red-600 transition"
-            >
-              Đóng
-            </button>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-indigo-500 to-purple-600">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                  <span className="text-2xl">📄</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Xem trước CV</h3>
+                  <p className="text-sm text-white/80">Hồ sơ ứng viên</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {/* Download Button */}
+                <a
+                  href={getOriginalUrl(selectedCV)}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition"
+                  title="Tải xuống CV"
+                >
+                  <ArrowDownTrayIcon className="w-5 h-5" />
+                  <span className="hidden sm:inline">Tải xuống</span>
+                </a>
+
+                {/* Open in New Tab */}
+                <a
+                  href={getOriginalUrl(selectedCV)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition"
+                  title="Mở trong tab mới"
+                >
+                  <ArrowsPointingOutIcon className="w-5 h-5" />
+                  <span className="hidden sm:inline">Mở rộng</span>
+                </a>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedCV(null)}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition"
+                  title="Đóng"
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                  <span className="hidden sm:inline">Đóng</span>
+                </button>
+              </div>
+            </div>
+
+            {/* CV Preview Content */}
+            <div className="flex-1 bg-gray-100 p-4 overflow-hidden">
+              <iframe
+                src={selectedCV}
+                className="w-full h-full rounded-lg shadow-inner bg-white"
+                title="CV Preview"
+                frameBorder="0"
+              />
+            </div>
           </div>
         </div>
       )}
