@@ -17,7 +17,7 @@ const n8n = axios.create({
 export const postToFacebook = async (data) => {
   try {
     console.log("Posting to Facebook:", data);
-    console.log("Webhook URL:", n8n.defaults.baseURL + "/webhook-test/job-post");
+    console.log("Webhook URL:", n8n.defaults.baseURL + "/webhook/job-post");
 
     let payload = {
       title: data.title || '',
@@ -50,7 +50,7 @@ export const postToFacebook = async (data) => {
     }
 
     console.log("Sending payload as JSON (with base64 image)");
-    const res = await n8n.post("/webhook-test/job-post", payload);
+    const res = await n8n.post("/webhook/job-post", payload);
     console.log("Facebook post response:", res.data);
     return res.data;
 
