@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { postJobThreads } from "../../api/n8n";
+import { postJobThreads, deleteThreadPost } from "../../api/n8n";
+import { getThreadPostHistory } from "../../api/threadHistory";
+import { supabase } from "../../lib/supabaseClient";
 
 export default function JobPostThreads() {
+  const [activeTab, setActiveTab] = useState("post"); // "post" hoặc "history"
   const [form, setForm] = useState({
     title: "",
     company: "Airecruit",
@@ -105,7 +108,71 @@ export default function JobPostThreads() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-md w-full max-w-4xl mx-auto mt-6">
+    <div className="w-full">
+      {/* Sticky Navigation */}
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div className="flex gap-2 p-6 max-w-6xl mx-auto">
+          <button
+            onClick={() => setActiveTab("post")}
+            className={`px-6 py-3 font-semibold transition-all ${
+              activeTab === "post"
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            📝 Đăng bài
+          </button>
+          <button
+            onClick={() => setActiveTab("history")}
+            className={`px-6 py-3 font-semibold transition-all ${
+              activeTab === "history"
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            📊 Lịch sử post
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6 bg-white rounded-xl shadow-md w-full max-w-6xl mx-auto mt-6">
+        {/* Tab Content */}
+        {activeTab === "post" ? (
+          <PostTabContent
+            form={form}
+            setForm={setForm}
+            loading={loading}
+            lastError={lastError}
+            msg={msg}
+            preview={preview}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            resetForm={resetForm}
+          />
+        ) : (
+          <HistoryTabContent />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Component: Tab Đăng bài
+function PostTabContent({
+  form,
+  setForm,
+  loading,
+  lastError,
+  msg,
+  preview,
+  handleChange,
+  handleSubmit,
+  resetForm,
+}) {
+  return (
+    <>
+      {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
           📱 Auto Posting - Threads
@@ -269,6 +336,196 @@ export default function JobPostThreads() {
           )}
         </div>
       </div>
+    </>
+  );
+}
+
+// Component: Tab Lịch sử post
+function HistoryTabContent() {
+  const [historyData, setHistoryData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+
+  // Load dữ liệu từ Supabase khi component mount
+  React.useEffect(() => {
+    if (!hasLoaded) {
+      loadHistoryData();
+      setHasLoaded(true);
+    }
+  }, [hasLoaded]);
+
+  const loadHistoryData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getThreadPostHistory();
+      setHistoryData(data);
+    } catch (err) {
+      console.error("Error loading history:", err);
+      setError("Không thể tải lịch sử. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletePost = async (post) => {
+    if (!post.idpost) {
+      alert("❌ Không tìm thấy ID bài viết");
+      return;
+    }
+
+    if (!window.confirm("Bạn chắc chắn muốn xóa bài viết này không?")) {
+      return;
+    }
+
+    setDeleting(post.id);
+    try {
+      // 1️⃣ Gửi request xóa đến n8n
+      const response = await deleteThreadPost(post.idpost);
+      console.log("Delete response:", response);
+
+      if (response.success) {
+        // 2️⃣ Nếu success, xóa trên Supabase
+        const { error: deleteError } = await supabase
+          .from("job_posts")
+          .delete()
+          .eq("id", post.id);
+
+        if (deleteError) {
+          console.error("Error deleting from Supabase:", deleteError);
+          alert("❌ Xóa trên Supabase thất bại: " + deleteError.message);
+        } else {
+          alert("✅ Xóa bài viết thành công!");
+          // Reload lịch sử sau khi xóa
+          loadHistoryData();
+        }
+      } else {
+        alert(
+          "❌ Xóa bài viết thất bại: " + (response.message || "Unknown error")
+        );
+      }
+    } catch (err) {
+      console.error("Error deleting post:", err);
+      alert("❌ Lỗi xóa bài viết: " + err.message);
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-700">
+          📊 Lịch sử đăng bài
+        </h3>
+        <button
+          onClick={loadHistoryData}
+          disabled={loading}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium text-sm transition-colors"
+        >
+          {loading ? "⏳ Đang tải..." : "🔄 Tải lại"}
+        </button>
+      </div>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
+
+      {loading && !historyData.length ? (
+        <div className="text-center py-8">
+          <p className="text-gray-600">⏳ Đang tải dữ liệu...</p>
+        </div>
+      ) : historyData.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-600">📭 Chưa có bài đăng nào</p>
+        </div>
+      ) : (
+        <>
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-100 border-b-2 border-gray-300">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 flex-1">
+                    Caption
+                  </th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 flex-1">
+                    Ảnh
+                  </th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 w-24">
+                    Trạng thái
+                  </th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 w-32">
+                    Hành động
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {historyData.map((post) => (
+                  <tr
+                    key={post.id}
+                    className="border-b border-gray-200 hover:bg-gray-50 transition-colors align-top"
+                  >
+                    <td className="px-4 py-3 text-gray-800 align-top flex-1 max-w-xs">
+                      {post.caption || "Không"}
+                    </td>
+                    <td className="px-4 py-3 text-center align-top flex-1">
+                      {post.image_url ? (
+                        <div className="flex justify-center">
+                          <img
+                            src={post.image_url}
+                            alt="Post"
+                            className="w-72 h-72 object-cover rounded"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <span className="text-gray-600">Không</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 align-top text-center w-24">
+                      <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium inline-block">
+                        {post.status || "posted"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 align-top text-center w-32">
+                      <div className="flex flex-col gap-2 justify-center">
+                        <button
+                          onClick={() => {
+                            if (post.linkpost) {
+                              window.open(post.linkpost, "_blank");
+                            } else {
+                              alert("❌ Link bài viết không tồn tại");
+                            }
+                          }}
+                          className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 font-medium transition-colors"
+                        >
+                          Xem
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleDeletePost(post);
+                          }}
+                          disabled={deleting === post.id}
+                          className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 disabled:bg-gray-400 font-medium transition-colors"
+                        >
+                          {deleting === post.id ? "⏳ Xóa..." : "Xóa"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }

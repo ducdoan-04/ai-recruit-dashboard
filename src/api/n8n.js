@@ -104,7 +104,6 @@ export const getCandidatesNoCV = async () => {
   }
 };
 
-
 // Đăng tin tuyển dụng lên website
 export const postToWebsite = async (data) => {
   try {
@@ -118,6 +117,49 @@ export const postToWebsite = async (data) => {
     return res.data;
   } catch (err) {
     console.error("Error posting to Website:", err);
+    console.error("Error status:", err.response?.status);
+    console.error("Error data:", err.response?.data);
+    console.error("Error config:", err.config);
+    throw err;
+  }
+};
+
+// Xóa thread post
+export const deleteThreadPost = async (idpost) => {
+  try {
+    if (!idpost) {
+      throw new Error("ID post không hợp lệ");
+    }
+
+    console.log("🗑️ Xóa thread post:", idpost);
+    console.log(
+      "Webhook URL:",
+      "https://n8n.airecruit.io.vn/webhook/delete-thread"
+    );
+
+    const res = await axios.post(
+      "https://n8n.airecruit.io.vn/webhook/delete-thread",
+      {
+        idpost: idpost,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Delete thread response:", res.data);
+
+    // Mặc định success = false nếu không có response
+    const responseData = {
+      success: res.data?.success || false,
+      ...res.data,
+    };
+
+    return responseData;
+  } catch (err) {
+    console.error("Error deleting thread post:", err);
     console.error("Error status:", err.response?.status);
     console.error("Error data:", err.response?.data);
     console.error("Error config:", err.config);
@@ -149,6 +191,8 @@ export const postJobThreads = async (data) => {
       image_url: res.data?.image_url || null,
       caption: res.data?.caption || null,
       status: res.data?.status || "posted",
+      linkpost: res.data?.linkpost || null,
+      idpost: res.data?.idpost || null,
     });
 
     console.log("✅ Uploaded to Supabase:", uploadRes);
