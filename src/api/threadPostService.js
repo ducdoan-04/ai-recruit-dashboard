@@ -36,6 +36,8 @@ export const uploadThreadPostToSupabase = async (data) => {
       image_url,
       caption,
       status,
+      linkpost,
+      idpost,
     } = data;
 
     console.log("📥 Nhận dữ liệu từ n8n webhook:", data);
@@ -59,6 +61,8 @@ export const uploadThreadPostToSupabase = async (data) => {
       status: status || "posted",
       category: "threads", // Mark as thread posting
       created_at: new Date().toISOString(),
+      link_post: linkpost || null,
+      id_post: idpost || null,
     };
 
     console.log("💾 Chuẩn bị lưu vào Supabase job_posts:", payload);
