@@ -13,14 +13,47 @@ const n8n = axios.create({
   },
 });
 
-// Gửi dữ liệu job đến workflow Facebook (qua proxy để tránh CORS khi dev)
+// 🆕 Gửi dữ liệu job + ảnh (base64) đến workflow Facebook
 export const postToFacebook = async (data) => {
   try {
     console.log("Posting to Facebook:", data);
-    console.log("Webhook URL:", n8n.defaults.baseURL + "/webhook/job-post");
-    const res = await n8n.post("/webhook/job-post", data);
+    console.log("Webhook URL:", n8n.defaults.baseURL + "/webhook-test/job-post");
+
+    let payload = {
+      title: data.title || '',
+      company: data.company || 'Airecruit',
+      schedule: data.schedule || '',
+      link: data.link || '',
+      requirements: data.requirements || '',
+      benefits: data.benefits || '',
+    };
+
+    // 🆕 Nếu có ảnh, convert sang base64
+    if (data.image instanceof File) {
+      console.log("📸 Converting image to base64...");
+      
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(data.image);
+      });
+
+      payload.image = base64; // ✅ Base64 string (với prefix: data:image/png;base64,...)
+      payload.imageName = data.image.name; // ✅ Tên file (vd: photo.jpg)
+      payload.imageType = data.image.type; // ✅ MIME type (vd: image/png)
+      
+      console.log("✅ Image converted to base64");
+      console.log("Image name:", payload.imageName);
+      console.log("Image type:", payload.imageType);
+      console.log("Image size:", (base64.length / 1024).toFixed(2), "KB");
+    }
+
+    console.log("Sending payload as JSON (with base64 image)");
+    const res = await n8n.post("/webhook-test/job-post", payload);
     console.log("Facebook post response:", res.data);
     return res.data;
+
   } catch (err) {
     console.error("Error posting to Facebook:", err);
     console.error("Error status:", err.response?.status);
@@ -29,6 +62,7 @@ export const postToFacebook = async (data) => {
     throw err;
   }
 };
+
 
 // Gửi dữ liệu job đến workflow Twitter (qua proxy để tránh CORS khi dev)
 export const postToTwitter = async (data) => {
