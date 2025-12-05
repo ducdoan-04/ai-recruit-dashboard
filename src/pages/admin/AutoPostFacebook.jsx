@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { postToFacebook } from "../../api/n8n";
+import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function AutoPostFacebook() {
   const [form, setForm] = useState({
@@ -9,9 +10,11 @@ export default function AutoPostFacebook() {
     link: "",
     requirements: "",
     benefits: "",
+    image: null, // Thay đổi từ base64 sang file object
   });
   const [loading, setLoading] = useState(false);
   const [lastError, setLastError] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,8 +28,42 @@ export default function AutoPostFacebook() {
       link: "",
       requirements: "",
       benefits: "",
+      image: null,
     });
+    setImagePreview(null);
     setLastError(null);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('❌ Chỉ chấp nhận file ảnh (JPG, PNG, WebP)');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('❌ File ảnh không được vượt quá 5MB');
+      return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Store file
+    setForm({ ...form, image: file });
+  };
+
+  const removeImage = () => {
+    setForm({ ...form, image: null });
+    setImagePreview(null);
   };
 
   const handleSubmit = async (e) => {
@@ -48,10 +85,13 @@ export default function AutoPostFacebook() {
       const payload = {
         title: form.title,
         company: form.company,
-        schedule_time: form.schedule, // Map schedule to schedule_time
+        schedule: form.schedule, // Map schedule to schedule_time
         link: form.link,
         requirements: form.requirements,
         benefits: form.benefits,
+        image: form.image,
+        imageName: form.image?.name, // Thêm trường imageName
+        imageType: form.image?.type, // Thêm trường imageType
       };
       
       console.log("Sending payload:", payload);
@@ -193,6 +233,61 @@ export default function AutoPostFacebook() {
             className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
           />
         </div>
+
+        {/* 🆕 Image Upload Section - Improved */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            📸 Upload ảnh (tùy chọn)
+          </label>
+          
+          {/* Preview Image */}
+          {imagePreview ? (
+            <div className="mb-4 relative inline-block">
+              <img 
+                src={imagePreview} 
+                alt="Preview" 
+                className="w-full max-w-md h-64 object-cover rounded-lg shadow-lg border-2 border-gray-200"
+              />
+              <button
+                type="button"
+                onClick={removeImage}
+                className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 shadow-lg transition-all hover:scale-110"
+                title="Xóa ảnh"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+          ) : (
+            /* Upload Box */
+            <label className="block w-full border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 group">
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center group-hover:from-blue-200 group-hover:to-indigo-200 transition-all">
+                  <PhotoIcon className="w-8 h-8 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-gray-700 font-semibold text-lg">
+                    Kéo thả hoặc click để chọn ảnh
+                  </p>
+                  <p className="text-gray-500 text-sm mt-1">
+                    Hỗ trợ: JPG, PNG, WebP · Tối đa 5MB
+                  </p>
+                </div>
+              </div>
+            </label>
+          )}
+          
+          <p className="text-xs text-gray-500 mt-2">
+            💡 <strong>Tips:</strong> Ảnh nên có kích thước 1200x630px để hiển thị tốt trên Facebook
+          </p>
+        </div>
+
         <div className="flex gap-3 pt-4">
           <button
             type="submit"
