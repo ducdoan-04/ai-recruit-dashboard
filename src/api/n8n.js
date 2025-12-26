@@ -13,7 +13,7 @@ const n8n = axios.create({
   },
 });
 
-// 🆕 Gửi dữ liệu job + ảnh (base64) đến workflow Facebook
+// 🆕 Gửi dữ liệu job + ảnh (base64) đến workflow Facebook và upload response lên Supabase
 export const postToFacebook = async (data) => {
   try {
     console.log("Posting to Facebook:", data);
@@ -52,13 +52,64 @@ export const postToFacebook = async (data) => {
     console.log("Sending payload as JSON (with base64 image)");
     const res = await n8n.post("/webhook/job-post", payload);
     console.log("Facebook post response:", res.data);
-    return res.data;
+    console.log("Response type:", typeof res.data);
+    console.log("Full response:", res);
+
+    // 📤 Tự động upload response vào bảng fb_posting trên Supabase
+    try {
+      console.log("📤 Bắt đầu upload vào Supabase...");
+      
+      const responseData = res.data || res;
+      console.log("📝 Response data để insert:", responseData);
+      
+      const insertData = {
+        title: responseData?.title || "",
+        company: responseData?.company || "Airecruit",
+        jd_link: responseData?.jd_link || null,
+        requirements: responseData?.requirements || null,
+        benefits: responseData?.benefits || null,
+        schedule_time: responseData?.schedule_time || null,
+        caption: responseData?.caption || null,
+        fb_image_id: responseData?.fb_image_id || null,
+        fb_post_id: responseData?.fb_post_id || null,
+        raw_fb_response: JSON.stringify(responseData),
+        post_url: responseData?.post_url || null,
+        status: responseData?.status || "success",
+        raw_request: JSON.stringify(payload),
+      };
+
+      console.log("📝 Insert data chuẩn bị:", insertData);
+
+      const { data: uploadRes, error: supabaseError } = await supabase
+        .from("fb_posting")
+        .insert([insertData]);
+
+      if (supabaseError) {
+        console.error("❌ Supabase error:", supabaseError);
+        console.error("  Code:", supabaseError.code);
+        console.error("  Message:", supabaseError.message);
+        throw supabaseError;
+      }
+
+      console.log("✅ Supabase insert success:", uploadRes);
+
+      return {
+        n8nResponse: res.data,
+        supabaseResponse: uploadRes,
+      };
+    } catch (supabaseErr) {
+      console.error("❌ Supabase upload failed:", supabaseErr);
+      console.error("Error details:", supabaseErr.message);
+      throw supabaseErr;
+    }
 
   } catch (err) {
-    console.error("Error posting to Facebook:", err);
-    console.error("Error status:", err.response?.status);
-    console.error("Error data:", err.response?.data);
-    console.error("Error config:", err.config);
+    console.error("❌ Error posting to Facebook:", err);
+    console.error("  Message:", err.message);
+    if (err.response) {
+      console.error("  Status:", err.response.status);
+      console.error("  Data:", err.response.data);
+    }
     throw err;
   }
 };
@@ -141,13 +192,14 @@ export const getCandidatesNoCV = async () => {
 // Đăng tin tuyển dụng lên website
 export const postToWebsite = async (data) => {
   try {
-    console.log("Posting to Website:", data);
+    console.log("🌐 [postToWebsite] Bắt đầu...");
+    console.log("📋 Data:", data);
     console.log(
-      "Webhook URL:",
-      n8n.defaults.baseURL + "/webhook/jobPostWebsite"
+      "🔗 Webhook URL:",
+      n8n.defaults.baseURL + "/webhook/job-post"
     );
-    const res = await n8n.post("/webhook/jobPostWebsite", data);
-    console.log("Website post response:", res.data);
+    const res = await n8n.post("/webhook/job-post", data);
+    console.log("✅ n8n response:", res.data);
     return res.data;
   } catch (err) {
     console.error("Error posting to Website:", err);
