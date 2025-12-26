@@ -76,6 +76,7 @@ export default function InterviewSchedule() {
                 const endStr = end ? new Date(end).toLocaleString() : "";
                 const title = e?.summary || e?.title || "(No title)";
                 const location = e?.location || e?.conferenceData?.entryPoints?.[0]?.uri || "";
+                const hangoutLink = e?.hangoutLink || "";
                 return (
                   <li key={e.id || i} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 pl-6 pr-4 py-4 rounded-lg hover:shadow-md transition-all duration-300">
                     <div className="flex items-start justify-between">
@@ -94,10 +95,23 @@ export default function InterviewSchedule() {
                           )}
                         </div>
                       </div>
-                      <div className="ml-4">
+                      <div className="ml-4 flex flex-col gap-2">
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                           Phỏng vấn
                         </span>
+                        {hangoutLink && (
+                          <a
+                            href={hangoutLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-semibold rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-300 shadow-md hover:shadow-lg"
+                          >
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                            </svg>
+                            Join Room
+                          </a>
+                        )}
                       </div>
                     </div>
                   </li>
